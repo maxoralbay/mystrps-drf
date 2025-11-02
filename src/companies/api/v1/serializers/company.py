@@ -24,6 +24,15 @@ class CompanySerializer(HistorySerializer, serializers.ModelSerializer):
         )
         read_only_fields = ("id", "created", "modified")
 
+class CompanyListSerializer(HistorySerializer, serializers.ModelSerializer, CompanyOwnerMixin):
+    """Serializer for listing companies."""
+
+    owner = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Company
+        fields = ("id", "name", "legal_name", "company_code", "description", "status", "foundation_date", "industry", "website_url", "tn_parent", "owner")
+        read_only_fields = ("id", "created", "modified")
 
 class CompanyCreateUpdateSerializer(HistorySerializer, serializers.ModelSerializer):
     """Serializer for creating and updating companies."""
