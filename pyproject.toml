@@ -1,0 +1,58 @@
+[project]
+name = "drf"
+version = "0.1.0"
+description = "Django REST Framework project with local authentication"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2.2",
+    "django-filter>=25.1",
+    "djangorestframework>=3.16.0",
+    "djangorestframework-simplejwt>=5.5.0",
+    "drf-spectacular>=0.28.0",
+    "python-decouple>=3.8",
+    "psycopg2-binary>=2.9.10",
+    "django-split-settings>=1.3.2",
+    "django-simple-history>=3.8.0",
+    "django-treenode>=0.23.1",
+    "granian>=2.4.2",
+    "tzdata>=2025.2",
+    "redis>=6.3.0",
+    "celery>=5.5.3",
+    "django-celery-results>=2.6.0",
+    "django-celery-beat>=2.8.1",
+    "loguru>=0.7.3",
+    "django-redis>=6.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+]
+test = [
+    "pytest>=8.0.0",
+    "pytest-django>=4.8.0",
+    "factory-boy>=3.3.0",
+    "pytest-mock>=3.12.0",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "server.settings.environments.testing"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+python_classes = ["*Tests", "*Test", "Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--create-db",
+    "--nomigrations",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+

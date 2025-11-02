@@ -1,0 +1,75 @@
+#version: '3.8'
+
+services:
+  web:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    container_name: drf_django_app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./src:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/drf
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=django-db
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SETTINGS_MODULE=server.settings
+    depends_on:
+      - db
+      - redis
+    stdin_open: true
+    tty: true
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    container_name: drf_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  celery:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+      target: dev
+    container_name: drf_celery_worker
+    entrypoint: ["python"]
+    command: ["-m", "celery", "-A", "server", "worker", "-l", "INFO"]
+    volumes:
+      - ./src:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp
+
+  db:
+    image: postgres:16-alpine
+    container_name: drf_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: drf
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  redis_data:
+
