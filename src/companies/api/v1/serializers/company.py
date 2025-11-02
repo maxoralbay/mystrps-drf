@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from companies.models import Company
 from utils.serializers import HistorySerializer
+from companies.mixins.CompanyMixins import CompanyOwnerMixin
 
-
-class CompanySerializer(HistorySerializer, serializers.ModelSerializer):
+class CompanySerializer(HistorySerializer, serializers.ModelSerializer, CompanyOwnerMixin):
     """Serializer for listing companies."""
-
+    owner = serializers.SerializerMethodField()
     class Meta:
         model = Company
         fields = (
@@ -21,6 +21,7 @@ class CompanySerializer(HistorySerializer, serializers.ModelSerializer):
             "tn_parent",
             "created",
             "modified",
+            "owner",
         )
         read_only_fields = ("id", "created", "modified")
 
